@@ -27,25 +27,30 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build Web Assets & Initialize Capacitor
+      - name: Prepare Project and Add Android Platform
         run: |
           mkdir -p www
           cp index.html www/index.html
           npm init -y
-          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
-          npx cap init "Device Lock" com.device.lock --web-dir www
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          cat << 'EOF' > capacitor.config.json
+          {
+            "appId": "com.device.lock",
+            "appName": "Device Lock",
+            "webDir": "www"
+          }
+          EOF
           npx cap add android
-          npx cap sync android
 
       - name: Accept Android Licenses
         run: |
           yes | sdkmanager --licenses || true
 
-      - name: Build Debug APK with Gradle
+      - name: Compile Debug APK
         run: |
           cd android
           chmod +x ./gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
