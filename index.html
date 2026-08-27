@@ -1,1 +1,470 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><title>Device Lock</title><style>*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f3f4f6;color:#111827;overflow-y:auto}.page{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:12vh 24px 40px;text-align:center}.card{width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center}.lock-icon{width:36px;height:36px;margin-bottom:28px;color:#111827}.lock-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}h1{font-size:26px;font-weight:600;line-height:1.25;color:#111827;margin-bottom:12px;letter-spacing:-0.3px}p.subtitle{font-size:15px;color:#4b5563;font-weight:400;margin-bottom:34px}.screen{display:none;width:100%}.password-wrap{position:relative;width:100%;margin-bottom:16px}.password-input{width:100%;height:54px;border:0;outline:0;border-radius:27px;background:#e5e7eb;color:#111827;padding:0 50px 0 24px;font-size:16px;text-align:center;letter-spacing:1px;caret-color:#1e40af}.password-input::placeholder{color:#9ca3af;font-size:15px;letter-spacing:normal}.password-input:focus{background:#dfe2e8}.toggle{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4b5563}.toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.reset-btn{width:100%;height:44px;border:0;border-radius:22px;background:transparent;color:#dc2626;font-size:14px;font-weight:500;cursor:pointer;margin-top:10px}.status{min-height:22px;margin-top:12px;font-size:14px}.status.success{color:#15803d}.status.error{color:#dc2626}.saved-vault{display:none;width:100%;margin-top:24px;text-align:left}.saved-vault h2{font-size:18px;font-weight:600;margin-bottom:12px}.entry{background:#e5e7eb;border-radius:16px;padding:12px 14px;margin-bottom:10px}.entry-date{font-size:12px;color:#6b7280;margin-bottom:8px}.entry-row{display:flex;gap:8px;align-items:center}.saved-password{flex:1;min-width:0;height:40px;border:0;outline:0;border-radius:10px;background:#fff;color:#111827;padding:0 10px;font-size:14px}.small-btn{border:0;border-radius:10px;padding:0 12px;height:40px;cursor:pointer;font-size:13px;font-weight:500}.show-btn{background:#111827;color:white}.del-btn{background:#dc2626;color:white}.lock-vault{width:100%;height:48px;margin-top:14px;border:0;border-radius:24px;background:#111827;color:white;font-size:15px;font-weight:600;cursor:pointer}</style></head><body><main class="page"><section class="card"><div class="lock-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div id="createScreen" class="screen"><h1>Create your vault</h1><p class="subtitle">Enter vault password and press Enter</p><form id="createForm" onsubmit="handleCreate(event)"><div class="password-wrap"><input id="createPassword" class="password-input" type="password" placeholder="Create password (press Enter)" autocomplete="new-password" spellcheck="false"><button id="createToggle" class="toggle" type="button" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></button></div></form><div id="createStatus" class="status"></div></div><div id="unlockScreen" class="screen"><h1>Enter your complex<br>password again</h1><p class="subtitle">Enter your device password to continue</p><form id="unlockForm" onsubmit="handleUnlock(event)"><div class="password-wrap"><input id="unlockPassword" class="password-input" type="password" placeholder="" autocomplete="current-password" spellcheck="false"><button id="unlockToggle" class="toggle" type="button" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></button></div></form><button id="resetFromUnlock" class="reset-btn" type="button">Reset Vault & Wipe Data</button><div id="unlockStatus" class="status"></div></div><div id="mainScreen" class="screen"><h1>Save new password</h1><p class="subtitle">Enter a password to encrypt and store</p><form id="saveForm" onsubmit="handleSave(event)"><div class="password-wrap"><input id="password" class="password-input" type="password" placeholder="Enter password (press Enter)" autocomplete="off" spellcheck="false"><button id="passwordToggle" class="toggle" type="button" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></button></div></form><div id="saveStatus" class="status"></div><div id="savedVault" class="saved-vault"><h2>Saved passwords</h2><div id="entries"></div><button id="lockVault" class="lock-vault" type="button">Lock Vault</button><button id="resetFromMain" class="reset-btn" type="button">Reset Vault & Wipe Data</button></div></div></section></main><script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script><script>"use strict";let sessionMasterKey=null;const createScreen=document.getElementById("createScreen"),unlockScreen=document.getElementById("unlockScreen"),mainScreen=document.getElementById("mainScreen"),createPassword=document.getElementById("createPassword"),unlockPassword=document.getElementById("unlockPassword"),password=document.getElementById("password"),createStatus=document.getElementById("createStatus"),unlockStatus=document.getElementById("unlockStatus"),saveStatus=document.getElementById("saveStatus"),savedVault=document.getElementById("savedVault"),entriesContainer=document.getElementById("entries");function showScreen(e){createScreen.style.display="none",unlockScreen.style.display="none",mainScreen.style.display="none",e.style.display="block"}function getEntries(){try{const e=localStorage.getItem("vault_entries");return e?JSON.parse(e):[]}catch(e){return[]}}function saveEntries(e){localStorage.setItem("vault_entries",JSON.stringify(e))}function deriveHash(e,t){return CryptoJS.PBKDF2(e,t,{keySize:8,iterations:5000}).toString()}function encryptData(e,t){return CryptoJS.AES.encrypt(e,t).toString()}function decryptData(e,t){const n=CryptoJS.AES.decrypt(e,t);return n.toString(CryptoJS.enc.Utf8)}function handleCreate(e){e&&e.preventDefault();const t=createPassword.value.trim();if(createStatus.textContent="",createStatus.className="status",t.length<10)return createStatus.textContent="Use at least 10 characters for your password.",void(createStatus.className="status error");try{const e=CryptoJS.lib.WordArray.random(16).toString();localStorage.setItem("vault_salt",e);const n=deriveHash(t,e);sessionMasterKey=n;const s=encryptData("SECURE_VAULT_VERIFICATION",n);localStorage.setItem("vault_verification",s),saveEntries([]),createPassword.value="",showScreen(mainScreen),password.value="",password.focus(),loadEntries()}catch(e){console.error(e),createStatus.textContent="Error initializing vault.",createStatus.className="status error"}}function handleUnlock(e){e&&e.preventDefault();const t=unlockPassword.value.trim();if(unlockStatus.textContent="",unlockStatus.className="status",!t)return unlockStatus.textContent="Enter your vault password.",void(unlockStatus.className="status error");try{const e=localStorage.getItem("vault_salt"),n=localStorage.getItem("vault_verification");if(!e||!n)return unlockStatus.textContent="Vault corrupted or reset.",void(unlockStatus.className="status error");const s=deriveHash(t,e);if("SECURE_VAULT_VERIFICATION"!==decryptData(n,s))return unlockPassword.value="",unlockStatus.textContent="Incorrect vault password.",void(unlockStatus.className="status error");sessionMasterKey=s,unlockPassword.value="",unlockStatus.textContent="",showScreen(mainScreen),password.value="",password.focus(),loadEntries()}catch(e){console.error(e),unlockPassword.value="",unlockStatus.textContent="Incorrect vault password.",unlockStatus.className="status error"}}function handleSave(e){e&&e.preventDefault();const t=password.value;if(saveStatus.textContent="",saveStatus.className="status",!t)return saveStatus.textContent="Enter a password first.",void(saveStatus.className="status error");if(!sessionMasterKey)return saveStatus.textContent="Vault is locked.",void(saveStatus.className="status error");try{const e=encryptData(t,sessionMasterKey),n=getEntries();n.push({id:Date.now().toString(36)+Math.random().toString(36).substr(2),encrypted:e,created:(new Date).toISOString()}),saveEntries(n),password.value="",saveStatus.textContent="Password saved.",saveStatus.className="status success",loadEntries(),password.focus()}catch(e){console.error(e),saveStatus.textContent="Could not save password.",saveStatus.className="status error"}}function loadEntries(){entriesContainer.innerHTML="",savedVault.style.display="block";const e=getEntries();if(0===e.length){const e=document.createElement("div");return e.textContent="No passwords saved yet.",e.style.color="#6b7280",e.style.fontSize="14px",e.style.padding="10px 0",void entriesContainer.appendChild(e)}[...e].reverse().forEach(t=>{createEntry(t,e)})}function createEntry(e,t){const n=document.createElement("div");n.className="entry";const s=document.createElement("div");s.className="entry-date",s.textContent="Saved "+new Date(e.created).toLocaleString();const a=document.createElement("div");a.className="entry-row";const r=document.createElement("input");r.className="saved-password",r.type="password",r.value="••••••••••••",r.readOnly=!0;const c=document.createElement("button");c.type="button",c.className="small-btn show-btn",c.textContent="Show",c.addEventListener("click",function(){if("password"===r.type)try{const t=decryptData(e.encrypted,sessionMasterKey);if(!t)throw new Error;r.type="text",r.value=t,c.textContent="Hide"}catch(e){alert("Unable to decrypt password.")}else r.type="password",r.value="••••••••••••",c.textContent="Show"});const o=document.createElement("button");o.type="button",o.className="small-btn del-btn",o.textContent="Delete",o.addEventListener("click",function(){confirm("Delete this password permanently?")&&(saveEntries(t.filter(t=>t.id!==e.id)),loadEntries())}),a.appendChild(r),a.appendChild(c),a.appendChild(o),n.appendChild(s),n.appendChild(a),entriesContainer.appendChild(n)}function lockVault(){sessionMasterKey=null,password.value="",entriesContainer.innerHTML="",savedVault.style.display="none",saveStatus.textContent="",unlockPassword.value="",showScreen(unlockScreen),unlockPassword.focus()}function resetVault(){if(confirm("Warning: This will permanently delete the vault and ALL stored passwords. Continue?")){localStorage.clear(),sessionMasterKey=null,createPassword.value="",unlockPassword.value="",password.value="",entriesContainer.innerHTML="",savedVault.style.display="none",createStatus.textContent="Vault completely reset.",createStatus.className="status success",unlockStatus.textContent="",saveStatus.textContent="",showScreen(createScreen),createPassword.focus()}}function setupToggle(e,t){const n=document.getElementById(e),s=document.getElementById(t);n.addEventListener("click",function(){const e="password"===s.type;s.type=e?"text":"password",n.innerHTML=e?'<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>':'<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>'})}document.getElementById("lockVault").addEventListener("click",lockVault),document.getElementById("resetFromUnlock").addEventListener("click",resetVault),document.getElementById("resetFromMain").addEventListener("click",resetVault),setupToggle("createToggle","createPassword"),setupToggle("unlockToggle","unlockPassword"),setupToggle("passwordToggle","password");function initialize(){try{localStorage.getItem("vault_salt")?(showScreen(unlockScreen),unlockPassword.focus()):(showScreen(createScreen),createPassword.focus())}catch(e){console.error(e),showScreen(createScreen)}}initialize();</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCU Roadmap to Avengers: Doomsday Tracker</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #e11d48;
+      --legacy: #38bdf8;
+      --infinity: #a855f7;
+      --multiverse: #f43f5e;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 24px 16px 60px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fb7185, #e11d48);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-top: 4px;
+    }
+
+    /* Sticky Progress Header */
+    .progress-box {
+      background: rgba(30, 41, 59, 0.96);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-bg {
+      height: 10px;
+      background: #0f172a;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #a855f7, #f43f5e);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Filter Tabs */
+    .filter-group {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .filter-group::-webkit-scrollbar { display: none; }
+
+    .pill {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+
+    .pill.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Phase Sections */
+    .phase-section {
+      margin-bottom: 24px;
+    }
+
+    .phase-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 800;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .phase-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .bg-legacy { background: var(--legacy); }
+    .bg-infinity { background: var(--infinity); }
+    .bg-multiverse { background: var(--multiverse); }
+
+    /* Movie Cards */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .item-card:hover {
+      border-color: #475569;
+    }
+
+    .item-card.watched {
+      background: #0f172a;
+      border-color: #1e293b;
+      opacity: 0.55;
+    }
+
+    .item-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .item-num {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 26px;
+      text-align: right;
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Full Name Display - No Truncation or Ellipsis */
+    .item-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: #f8fafc;
+      white-space: normal;
+      overflow: visible;
+      word-break: normal;
+    }
+
+    .item-card.watched .item-title {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    .btn-check {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s ease;
+      flex-shrink: 0;
+      min-width: 75px;
+    }
+
+    .item-card.watched .btn-check {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .btn-check:hover {
+      background: #334155;
+      color: white;
+    }
+
+    .item-card.watched .btn-check:hover {
+      background: #059669;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px dashed #475569;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+    .btn-reset:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>MCU Roadmap to Doomsday</h1>
+    <div class="subtitle">Complete 52-Project Full Title Checklist</div>
+  </header>
+
+  <div class="progress-box">
+    <div class="progress-header">
+      <span id="stat-count">0 / 52 Completed</span>
+      <span id="stat-percent" style="color: #38bdf8;">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="filter-group">
+    <button class="pill active" onclick="setFilter('all')">All (52)</button>
+    <button class="pill" onclick="setFilter('legacy')">Phase 1: Legacy</button>
+    <button class="pill" onclick="setFilter('infinity')">Phase 2: Infinity</button>
+    <button class="pill" onclick="setFilter('multiverse')">Phase 3: Multiverse</button>
+    <button class="pill" onclick="setFilter('unwatched')">Unwatched Only</button>
+  </div>
+
+  <div id="sections-container"></div>
+
+  <div class="footer">
+    <button class="btn-reset" onclick="resetToDefaults()">↺ Reset to Default Status</button>
+  </div>
+</div>
+
+<script>
+  const masterData = [
+    // Phase 1: Legacy Multiverse Foundations (1-15) - Default Watched
+    { id: 1, title: "X-Men (2000)", phase: "legacy", watched: true },
+    { id: 2, title: "Spider-Man (2002)", phase: "legacy", watched: true },
+    { id: 3, title: "X2: X-Men United (2003)", phase: "legacy", watched: true },
+    { id: 4, title: "Spider-Man 2 (2004)", phase: "legacy", watched: true },
+    { id: 5, title: "Fantastic Four (2005)", phase: "legacy", watched: true },
+    { id: 6, title: "X-Men: The Last Stand (2006)", phase: "legacy", watched: true },
+    { id: 7, title: "Spider-Man 3 (2007)", phase: "legacy", watched: true },
+    { id: 8, title: "X-Men: First Class (2011)", phase: "legacy", watched: true },
+    { id: 9, title: "The Amazing Spider-Man (2012)", phase: "legacy", watched: true },
+    { id: 10, title: "The Wolverine (2013)", phase: "legacy", watched: true },
+    { id: 11, title: "The Amazing Spider-Man 2 (2014)", phase: "legacy", watched: true },
+    { id: 12, title: "X-Men: Days of Future Past (2014)", phase: "legacy", watched: true },
+    { id: 13, title: "Deadpool (2016)", phase: "legacy", watched: true },
+    { id: 14, title: "Logan (2017)", phase: "legacy", watched: true },
+    { id: 15, title: "Deadpool 2 (2018)", phase: "legacy", watched: true },
+
+    // Phase 2: The Infinity Saga Core (16-34)
+    { id: 16, title: "Iron Man (2008)", phase: "infinity", watched: false },
+    { id: 17, title: "Iron Man 2 (2010)", phase: "infinity", watched: false },
+    { id: 18, title: "Thor (2011)", phase: "infinity", watched: false },
+    { id: 19, title: "Captain America: The First Avenger (2011)", phase: "infinity", watched: false },
+    { id: 20, title: "Marvel's The Avengers (2012)", phase: "infinity", watched: false },
+    { id: 21, title: "Captain America: The Winter Soldier (2014)", phase: "infinity", watched: false },
+    { id: 22, title: "Guardians of the Galaxy (2014)", phase: "infinity", watched: false },
+    { id: 23, title: "Avengers: Age of Ultron (2015)", phase: "infinity", watched: false },
+    { id: 24, title: "Ant-Man (2015)", phase: "infinity", watched: false },
+    { id: 25, title: "Captain America: Civil War (2016)", phase: "infinity", watched: false },
+    { id: 26, title: "Doctor Strange (2016)", phase: "infinity", watched: false },
+    { id: 27, title: "Guardians of the Galaxy Vol. 2 (2017)", phase: "infinity", watched: false },
+    { id: 28, title: "Spider-Man: Homecoming (2017)", phase: "infinity", watched: false },
+    { id: 29, title: "Thor: Ragnarok (2017)", phase: "infinity", watched: false },
+    { id: 30, title: "Black Panther (2018)", phase: "infinity", watched: false },
+    { id: 31, title: "Avengers: Infinity War (2018)", phase: "infinity", watched: false },
+    { id: 32, title: "Ant-Man and the Wasp (2018)", phase: "infinity", watched: false },
+    { id: 33, title: "Captain Marvel (2019)", phase: "infinity", watched: false },
+    { id: 34, title: "Avengers: Endgame (2019)", phase: "infinity", watched: false },
+
+    // Phase 3: The Multiverse Saga (35-52)
+    { id: 35, title: "Loki (Season 1) (2021)", phase: "multiverse", watched: false },
+    { id: 36, title: "WandaVision (Season 1) (2021)", phase: "multiverse", watched: false },
+    { id: 37, title: "Spider-Man: Far From Home (2019)", phase: "multiverse", watched: false },
+    { id: 38, title: "Spider-Man: No Way Home (2021)", phase: "multiverse", watched: false },
+    { id: 39, title: "Shang-Chi and the Legend of the Ten Rings (2021)", phase: "multiverse", watched: false },
+    { id: 40, title: "The Falcon and the Winter Soldier (Season 1) (2021)", phase: "multiverse", watched: false },
+    { id: 41, title: "Doctor Strange in the Multiverse of Madness (2022)", phase: "multiverse", watched: false },
+    { id: 42, title: "Black Panther: Wakanda Forever (2022)", phase: "multiverse", watched: false },
+    { id: 43, title: "Ant-Man and the Wasp: Quantumania (2023)", phase: "multiverse", watched: false },
+    { id: 44, title: "Loki (Season 2) (2023)", phase: "multiverse", watched: false },
+    { id: 45, title: "The Marvels (2023)", phase: "multiverse", watched: false },
+    { id: 46, title: "Deadpool & Wolverine (2024)", phase: "multiverse", watched: false },
+    { id: 47, title: "Agatha All Along (Season 1) (2024)", phase: "multiverse", watched: false },
+    { id: 48, title: "Captain America: Brave New World (2025)", phase: "multiverse", watched: false },
+    { id: 49, title: "Thunderbolts* (2025)", phase: "multiverse", watched: false },
+    { id: 50, title: "The Fantastic Four: First Steps (2025)", phase: "multiverse", watched: false },
+    { id: 51, title: "Spider-Man: Brand New Day (2026)", phase: "multiverse", watched: false },
+    { id: 52, title: "Avengers: Doomsday (2026)", phase: "multiverse", watched: false }
+  ];
+
+  const phaseMeta = {
+    legacy: { name: "Phase 1: Legacy Multiverse Foundations", class: "bg-legacy" },
+    infinity: { name: "Phase 2: The Infinity Saga Core", class: "bg-infinity" },
+    multiverse: { name: "Phase 3: The Multiverse Saga (Road to Doomsday)", class: "bg-multiverse" }
+  };
+
+  let currentList = JSON.parse(localStorage.getItem("mcu_tracker_fullnames_nowrap")) || masterData;
+  let activeFilter = "all";
+
+  function save() {
+    localStorage.setItem("mcu_tracker_fullnames_nowrap", JSON.stringify(currentList));
+    updateStats();
+  }
+
+  function updateStats() {
+    const total = currentList.length;
+    const watched = currentList.filter(i => i.watched).length;
+    const pct = Math.round((watched / total) * 100);
+    document.getElementById("stat-count").innerText = `${watched} / ${total} Completed`;
+    document.getElementById("stat-percent").innerText = `${pct}%`;
+    document.getElementById("progress-bar").style.width = `${pct}%`;
+  }
+
+  function toggle(id) {
+    const item = currentList.find(i => i.id === id);
+    if (item) {
+      item.watched = !item.watched;
+      save();
+      render();
+    }
+  }
+
+  function setFilter(filter) {
+    activeFilter = filter;
+    document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+    event.target.classList.add("active");
+    render();
+  }
+
+  function resetToDefaults() {
+    if (confirm("Reset all titles back to default watch status?")) {
+      currentList = JSON.parse(JSON.stringify(masterData));
+      save();
+      render();
+    }
+  }
+
+  function render() {
+    const container = document.getElementById("sections-container");
+    container.innerHTML = "";
+
+    const phases = ["legacy", "infinity", "multiverse"];
+
+    phases.forEach(phaseKey => {
+      if (activeFilter !== "all" && activeFilter !== "unwatched" && activeFilter !== phaseKey) return;
+
+      const items = currentList.filter(item => {
+        if (item.phase !== phaseKey) return false;
+        if (activeFilter === "unwatched" && item.watched) return false;
+        return true;
+      });
+
+      if (items.length === 0) return;
+
+      const section = document.createElement("div");
+      section.className = "phase-section";
+
+      section.innerHTML = `
+        <div class="phase-title">
+          <span class="phase-badge ${phaseMeta[phaseKey].class}"></span>
+          ${phaseMeta[phaseKey].name} (${items.filter(i=>i.watched).length}/${items.length})
+        </div>
+        <div class="item-list" id="list-${phaseKey}"></div>
+      `;
+
+      const listContainer = section.querySelector(`#list-${phaseKey}`);
+
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = `item-card ${item.watched ? "watched" : ""}`;
+        card.onclick = () => toggle(item.id);
+
+        card.innerHTML = `
+          <div class="item-info">
+            <span class="item-num">${item.id}.</span>
+            <span class="item-title">${item.title}</span>
+          </div>
+          <button class="btn-check" onclick="event.stopPropagation(); toggle(${item.id})">
+            ${item.watched ? "✓ Done" : "Mark"}
+          </button>
+        `;
+        listContainer.appendChild(card);
+      });
+
+      container.appendChild(section);
+    });
+
+    updateStats();
+  }
+
+  render();
+</script>
+</body>
+</html>
