@@ -32,15 +32,31 @@ jobs:
           mkdir -p www
           cp index.html www/index.html
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets
           cat << 'EOF' > capacitor.config.json
           {
-            "appId": "com.device.lock",
-            "appName": "Device Lock",
+            "appId": "com.mcu.doomsdaytracker",
+            "appName": "MCU Tracker",
             "webDir": "www"
           }
           EOF
           npx cap add android
+
+      - name: Generate App Icons
+        run: |
+          # If icon.png exists at repo root, structure it for capacitor-assets
+          if [ -f "icon.png" ]; then
+            mkdir -p assets
+            cp icon.png assets/icon-only.png
+            cp icon.png assets/icon-foreground.png
+            cp icon.png assets/icon-background.png
+            cp icon.png assets/logo.png
+            npx @capacitor/assets generate --android
+          elif [ -d "assets" ]; then
+            npx @capacitor/assets generate --android
+          else
+            echo "No custom icon.png found; using default icons."
+          fi
           npx cap sync android
 
       - name: Build APK with Gradle
@@ -52,6 +68,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DeviceLock-App-APK
+          name: MCU-Tracker-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          
