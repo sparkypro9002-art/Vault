@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Music Tutor Pro APK
 
 on:
   push:
@@ -35,8 +35,8 @@ jobs:
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets
           cat << 'EOF' > capacitor.config.json
           {
-            "appId": "com.mcu.doomsdaytracker",
-            "appName": "MCU Tracker",
+            "appId": "com.musictutor.pro",
+            "appName": "Music Tutor Pro",
             "webDir": "www"
           }
           EOF
@@ -44,18 +44,25 @@ jobs:
 
       - name: Generate App Icons
         run: |
-          # If icon.png exists at repo root, structure it for capacitor-assets
+          # Checks for icon.png or logo.png in the repository root
+          ICON_FILE=""
           if [ -f "icon.png" ]; then
+            ICON_FILE="icon.png"
+          elif [ -f "logo.png" ]; then
+            ICON_FILE="logo.png"
+          fi
+
+          if [ -n "$ICON_FILE" ]; then
             mkdir -p assets
-            cp icon.png assets/icon-only.png
-            cp icon.png assets/icon-foreground.png
-            cp icon.png assets/icon-background.png
-            cp icon.png assets/logo.png
+            cp "$ICON_FILE" assets/icon-only.png
+            cp "$ICON_FILE" assets/icon-foreground.png
+            cp "$ICON_FILE" assets/icon-background.png
+            cp "$ICON_FILE" assets/logo.png
             npx @capacitor/assets generate --android
           elif [ -d "assets" ]; then
             npx @capacitor/assets generate --android
           else
-            echo "No custom icon.png found; using default icons."
+            echo "No custom icon.png or logo.png found; using default icons."
           fi
           npx cap sync android
 
@@ -68,5 +75,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MCU-Tracker-Debug-APK
+          name: Music-Tutor-Pro-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
