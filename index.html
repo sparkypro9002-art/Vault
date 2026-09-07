@@ -1,440 +1,822 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Music Tutor Pro</title>
-<style>
-:root{
-  --primary:#ff2a5f;--primary-glow:rgba(255,42,95,.35);
-  --bg-dark:#0e0e11;--surface:#18181f;--surface-raised:#23232d;
-  --border:rgba(255,255,255,.08);--text-primary:#fff;--text-secondary:#8e8e9a;
-  --success:#2ee06b;--success-glow:rgba(46,224,107,.45);
-  --danger:#ff3b30;--danger-glow:rgba(255,59,48,.45)
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{width:100%;height:100%}
-body{background:#060608;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;color:var(--text-primary);display:flex;justify-content:center;align-items:center;min-height:100vh;min-height:100dvh;overflow:hidden;touch-action:manipulation}
-button,select{font:inherit}button{-webkit-appearance:none;appearance:none}
-.device{width:min(100vw,420px);height:min(100vh,860px);height:min(100dvh,860px);background:var(--bg-dark);position:relative;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.07)}
-@media(min-width:500px){.device{border-radius:36px}}
-.header{min-height:52px;padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(14,14,17,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:10;flex-shrink:0}
-.header-title{font-size:17px;font-weight:700;letter-spacing:-.3px;text-align:center}.btn-text{color:var(--primary);font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;min-width:54px;text-align:left;padding:4px 0}.btn-text:last-child{text-align:right}
-.screens{position:relative;flex:1;min-height:0;overflow:hidden}.screen{position:absolute;inset:0;display:flex;flex-direction:column;padding:20px;opacity:1;visibility:visible;transform:scale(1);transition:opacity .22s ease,transform .22s ease;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.screen.hidden{opacity:0;visibility:hidden;transform:scale(.98);pointer-events:none}
-.home-screen{display:flex;flex-direction:column;justify-content:space-between;padding:20px 20px 24px}
-.home-top{display:flex;flex-direction:column;gap:12px}
-.home-banner{background:linear-gradient(135deg,#ff2a5f,#ff6b3d);padding:18px 20px;border-radius:20px;color:#fff;box-shadow:0 12px 28px var(--primary-glow);cursor:pointer}.home-banner h2{font-size:18px;font-weight:800;margin-bottom:4px}.home-banner p{font-size:12.5px;opacity:.92;line-height:1.4}
-.play-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:16px 0}
-.btn-big-play{width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff4d79 0%,#ff2a5f 55%,#b8123a 100%);border:4px solid rgba(255,255,255,.2);color:#fff;font-size:24px;font-weight:900;letter-spacing:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px var(--primary-glow),inset 0 2px 6px rgba(255,255,255,.4);transition:transform .12s ease,box-shadow .12s ease}.btn-big-play:active{transform:scale(.92);box-shadow:0 8px 22px var(--primary-glow)}
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:auto}
-.menu-tile{background:var(--surface);border:1px solid var(--border);padding:15px;border-radius:18px;display:flex;flex-direction:column;gap:5px;cursor:pointer;transition:background .12s ease}.menu-tile:active{background:var(--surface-raised)}.tile-title{font-size:15px;font-weight:700;color:#fff}.tile-subtitle{font-size:11px;color:var(--text-secondary);line-height:1.35}
-.game-metrics{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:10px 12px;margin-bottom:12px;flex-shrink:0}.metric-box{text-align:center}.metric-box:first-child{text-align:left}.metric-box:last-child{text-align:right}.metric-label{font-size:9px;text-transform:uppercase;color:var(--text-secondary);font-weight:700}.metric-val{font-size:16px;font-weight:800;margin-top:2px}
-.staff-stage{flex:1;min-height:220px;background:#fff;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.45);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:14px;transition:background-color .15s ease}.staff-stage.flash-red-bg{background-color:#ffd2d6!important}.staff-svg{width:100%;height:100%;max-height:230px;display:block}#svgNoteGroup ellipse{fill:#1a1a1f;transition:fill .12s ease}#svgStem{stroke:#1a1a1f;transition:stroke .12s ease}#svgNoteGroup.correct-note ellipse{fill:var(--success)!important}#svgNoteGroup.correct-note #svgStem{stroke:var(--success)!important}
-.piano-wrapper{height:148px;position:relative;display:flex;background:#000;border-radius:14px 14px 4px 4px;overflow:hidden;box-shadow:0 -4px 14px rgba(0,0,0,.6);border:2px solid #222;flex-shrink:0;touch-action:none}
-.white-key{flex:1;position:relative;background:linear-gradient(to bottom,#f2f3f5 0%,#fff 15%);border-right:1px solid #c4c4cb;border-bottom:4px solid #adadb5;border-radius:0 0 6px 6px;cursor:pointer;transition:background .1s ease,border-color .1s ease,transform .08s ease;touch-action:none}
-.white-key:last-child{border-right:none}
-.white-key.active{background:#d4d4dc;border-bottom-width:1px;transform:translateY(2px)}
-.white-key.key-correct{background:linear-gradient(to bottom,#5be478 0%,var(--success) 100%)!important;border-bottom-color:#20a647!important;box-shadow:0 0 16px var(--success-glow)}
-.white-key.key-wrong{background:linear-gradient(to bottom,#ff6b64 0%,var(--danger) 100%)!important;border-bottom-color:#b81a12!important;box-shadow:0 0 16px var(--danger-glow)}
-.black-key{position:absolute;top:0;width:9.8%;height:90px;background:linear-gradient(to bottom,#323238 0%,#131317 100%);border-bottom:3px solid #000;border-radius:0 0 4px 4px;box-shadow:2px 3px 6px rgba(0,0,0,.55);z-index:5;cursor:pointer;transition:background .1s ease,height .08s ease;touch-action:none}
-.black-key.active{height:87px;background:#08080a}
-.bk-c4{left:10.2%}.bk-d4{left:24.5%}.bk-f4{left:53%}.bk-g4{left:67.3%}.bk-a4{left:81.6%}
-.card-stats{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px}.pill-group{display:flex;gap:8px;margin:8px 0 14px;flex-wrap:wrap}.opt-pill{flex:1;min-width:65px;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary);padding:9px 6px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:background .12s ease,color .12s ease,border-color .12s ease}.opt-pill:active{transform:scale(.98)}.opt-pill.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 4px 12px var(--primary-glow)}
-.range-select-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 0 6px}.select-wrapper{flex:1;min-width:0;background:var(--surface-raised);border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column}.select-label{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);margin-bottom:4px}.range-select{background:transparent;color:#fff;font-size:14px;font-weight:700;border:none;outline:none;cursor:pointer;width:100%}.range-select option{background:var(--surface-raised);color:#fff}.learn-text{font-size:13px;color:var(--text-secondary);line-height:1.6}.result-card{text-align:left}
-@media(max-height:680px){.btn-big-play{width:138px;height:138px;font-size:20px}.piano-wrapper{height:122px}.black-key{height:76px}.black-key.active{height:73px}.staff-stage{min-height:180px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCU Roadmap Checklist</title>
+  <style>
+    :root {
+      --bg-color: #0b111e;
+      --card-bg: #151f30;
+      --card-border: #1f2d45;
+      --text-main: #e2e8f0;
+      --text-muted: #7987a1;
+      --accent-red: #ff3b5c;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --btn-bg: #1e293b;
+      --btn-hover: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 24px 14px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 620px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .header-title-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #ff4b6e, #ff7a70);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Progress Card */
+    .progress-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .progress-percent {
+      color: var(--accent-blue);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background-color: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #ec4899);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-details {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Filter Tabs & Edit Trigger */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .tabs-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-red);
+      color: #fff;
+      border-color: var(--accent-red);
+    }
+
+    .btn-mode-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-mode-toggle.active {
+      background: #7c2d12;
+      border-color: #ea580c;
+      color: #ffedd5;
+    }
+
+    /* Edit Toolbar Drawer */
+    .edit-toolbar {
+      display: none;
+      background: #111b2b;
+      border: 1px dashed #334155;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .edit-mode-active .edit-toolbar {
+      display: flex;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background: var(--btn-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-action:hover {
+      background: var(--btn-hover);
+    }
+
+    .btn-action.highlight {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+      color: #bfdbfe;
+    }
+
+    /* Modal / Form Panel */
+    .form-panel {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-panel.open {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 8px 10px;
+      background: #0d1524;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* Phase Header */
+    .phase-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #a855f7;
+      margin: 18px 0 8px 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .phase-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #a855f7;
+      border-radius: 50%;
+    }
+
+    /* Item Card */
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .item-card.completed .item-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .item-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .item-index {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      min-width: 22px;
+    }
+
+    .item-info {
+      overflow: hidden;
+    }
+
+    .item-title {
+      font-size: 0.88rem;
+      font-weight: 500;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .item-meta {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Action Buttons */
+    .btn-toggle {
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--btn-bg);
+      color: var(--text-main);
+      min-width: 65px;
+      text-align: center;
+    }
+
+    .btn-toggle.done {
+      background: var(--accent-green);
+      color: #fff;
+    }
+
+    /* Edit controls (Hidden by default) */
+    .item-edit-controls {
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .edit-mode-active .item-edit-controls {
+      display: flex;
+    }
+
+    .edit-mode-active .btn-toggle {
+      display: none;
+    }
+
+    .btn-icon {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .btn-icon:hover {
+      background: var(--btn-hover);
+      color: #fff;
+    }
+
+    .btn-icon.delete:hover {
+      background: #dc2626;
+      border-color: #dc2626;
+    }
+
+    /* Quick Title Edit Button */
+    .btn-edit-title {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .edit-mode-active .btn-edit-title {
+      display: inline-block;
+    }
+
+    /* Footer Reset */
+    .footer-actions {
+      margin-top: 28px;
+      text-align: center;
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-reset:hover {
+      background: #1e293b;
+      color: var(--text-main);
+    }
+  </style>
 </head>
 <body>
-<div class="device">
-<header class="header">
-<button class="btn-text" id="leftNavBtn" type="button"></button>
-<div class="header-title" id="viewTitle">Music Tutor Pro</div>
-<button class="btn-text" id="rightNavBtn" type="button">Stats</button>
-</header>
-<main class="screens">
-<section id="home" class="screen home-screen">
-<div class="home-top">
-<div class="home-banner" id="learnBanner"><h2>Sight-Reading Master</h2><p>Master treble clef reading with configurable range &amp; tempo.</p></div>
-</div>
-<div class="play-center">
-<button class="btn-big-play" id="startButton" type="button">START</button>
-<span id="homeRangeBadge" style="font-size:11px;color:var(--text-secondary);letter-spacing:1.2px;font-weight:700">RANGE: C4 - A5</span>
-</div>
-<div class="home-grid"><div class="menu-tile" id="settingsTile"><span class="tile-title">Settings</span><span class="tile-subtitle">Adjust note ranges &amp; duration</span></div><div class="menu-tile" id="progressTile"><span class="tile-title">Progress</span><span class="tile-subtitle">Accuracy stats</span></div></div>
-</section>
 
-<section id="game" class="screen hidden">
-<div class="game-metrics">
-<div class="metric-box"><div class="metric-label">Time</div><div class="metric-val" id="timer">00:30</div></div>
-<div class="metric-box"><div class="metric-label">Score</div><div class="metric-val" id="score">0</div></div>
-<div class="metric-box"><div class="metric-label">Accuracy</div><div class="metric-val" id="accuracy">0%</div></div>
-<div class="metric-box"><div class="metric-label">Points</div><div class="metric-val" id="points">0</div></div>
-</div>
-<div class="staff-stage" id="staffStage">
-<svg class="staff-svg" viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet">
-<g stroke="#1a1a1f" stroke-width="1.8">
-<line x1="20" y1="80" x2="300" y2="80"/><line x1="20" y1="94" x2="300" y2="94"/><line x1="20" y1="108" x2="300" y2="108"/><line x1="20" y1="122" x2="300" y2="122"/><line x1="20" y1="136" x2="300" y2="136"/>
-</g>
-<text x="30" y="142" font-size="94" font-family="serif" fill="#1a1a1f" pointer-events="none">&#x1D11E;</text>
-<g id="svgLedgers" stroke="#1a1a1f" stroke-width="2" stroke-linecap="round"></g>
-<g id="svgNoteGroup" transform="translate(195,108)"><ellipse rx="8" ry="5.8" transform="rotate(-15)"></ellipse><line id="svgStem" x1="7.2" y1="-2" x2="7.2" y2="-42" stroke-width="2" stroke-linecap="round"></line></g>
-</svg>
-</div>
-<div class="piano-wrapper" id="pianoKeyboard">
-<div class="white-key" data-note="C"></div>
-<div class="white-key" data-note="D"></div>
-<div class="white-key" data-note="E"></div>
-<div class="white-key" data-note="F"></div>
-<div class="white-key" data-note="G"></div>
-<div class="white-key" data-note="A"></div>
-<div class="white-key" data-note="B"></div>
-<div class="black-key bk-c4" data-note="C#" data-frequency="277.18"></div>
-<div class="black-key bk-d4" data-note="D#" data-frequency="311.13"></div>
-<div class="black-key bk-f4" data-note="F#" data-frequency="369.99"></div>
-<div class="black-key bk-g4" data-note="G#" data-frequency="415.30"></div>
-<div class="black-key bk-a4" data-note="A#" data-frequency="466.16"></div>
-</div>
-</section>
+<div class="container" id="app-container">
+  <!-- Editable Header -->
+  <header>
+    <div class="header-title-container">
+      <h1 id="app-title-text">MCU Roadmap to Doomsday</h1>
+      <button class="btn-edit-title" onclick="editAppHeader()" title="Rename App Header">✎</button>
+    </div>
+    <div class="subtitle" id="app-subtitle-text">Complete Full Title Checklist</div>
+  </header>
 
-<section id="stats" class="screen hidden">
-<div class="card-stats"><div style="font-size:12px;color:var(--text-secondary);font-weight:700;margin-bottom:12px">LIFETIME RECORD</div>
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-<div><div style="font-size:10px;color:var(--text-secondary)">TOTAL GAMES</div><div style="font-size:20px;font-weight:800" id="statGames">0</div></div>
-<div><div style="font-size:10px;color:var(--text-secondary)">HIGH SCORE</div><div style="font-size:20px;font-weight:800" id="statScore">0</div></div>
-<div><div style="font-size:10px;color:var(--text-secondary)">AVG ACCURACY</div><div style="font-size:20px;font-weight:800" id="statAcc">0%</div></div>
-<div><div style="font-size:10px;color:var(--text-secondary)">MAX POINTS</div><div style="font-size:20px;font-weight:800" id="statPoints">0</div></div>
-</div></div>
-</section>
+  <!-- Progress Bar Card -->
+  <div class="progress-card">
+    <div class="progress-header">
+      <span id="progress-titles">0 / 0 Completed</span>
+      <span class="progress-percent" id="progress-percent">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+    <div class="progress-details">
+      <span id="progress-hours">0.0h / 0.0h watched</span>
+      <span>Calculated by runtime</span>
+    </div>
+  </div>
 
-<section id="options" class="screen hidden">
-<div class="card-stats"><div style="font-size:12px;color:var(--text-secondary);font-weight:700">SET NOTE RANGE</div>
-<div class="range-select-row"><div class="select-wrapper"><span class="select-label">From</span><select id="rangeStart" class="range-select"></select></div><div style="font-weight:800;color:var(--text-secondary);margin-top:14px">&rarr;</div><div class="select-wrapper"><span class="select-label">To</span><select id="rangeEnd" class="range-select"></select></div></div>
-<div style="font-size:11px;color:var(--text-secondary);margin:8px 0 10px">Quick Presets:</div>
-<div class="pill-group" id="presetPills" style="margin-bottom:0">
-<button class="opt-pill" type="button" data-start="C3" data-end="C4">C3 - C4</button><button class="opt-pill" type="button" data-start="F4" data-end="F5">F4 - F5</button><button class="opt-pill active" type="button" data-start="C4" data-end="A5">C4 - A5</button><button class="opt-pill" type="button" data-start="C3" data-end="C6">C3 - C6</button>
-</div></div>
-<div class="card-stats"><div style="font-size:12px;color:var(--text-secondary);font-weight:700">SESSION DURATION</div>
-<div class="pill-group" id="optDuration"><button class="opt-pill active" type="button" data-time="30">30s</button><button class="opt-pill" type="button" data-time="60">1 Min</button><button class="opt-pill" type="button" data-time="120">2 Mins</button></div>
-<div style="font-size:12px;color:var(--text-secondary);font-weight:700">SOUND EFFECTS</div>
-<div class="pill-group"><button class="opt-pill active" id="btnAudioToggle" type="button">Enabled</button></div></div>
-</section>
+  <!-- Filter tabs & Mode Toggle -->
+  <div class="controls-row">
+    <div class="tabs-container">
+      <button class="tab-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="tab-btn" onclick="setFilter('phase1', this)">Phase 1: Legacy</button>
+      <button class="tab-btn" onclick="setFilter('phase2', this)">Phase 2: Infinity</button>
+      <button class="tab-btn" onclick="setFilter('phase3', this)">Phase 3: Multiverse</button>
+    </div>
 
-<section id="result" class="screen hidden" style="text-align:center;justify-content:center">
-<h2 style="font-size:24px;font-weight:800;margin-bottom:6px">Session Complete</h2>
-<div class="card-stats result-card" style="margin-bottom:20px"><div style="font-size:16px;line-height:2;color:#fff">Score: <b id="finalScore">0</b><br>Accuracy: <b id="finalAcc">0%</b><br>Points: <b id="finalPoints" style="color:var(--primary);font-size:20px">0</b></div>
-<p style="font-size:11px;color:var(--text-secondary);margin-top:10px;line-height:1.5">Leaderboard ranking is evaluated based on your score multiplied by percentage accuracy.</p></div>
-<button class="btn-big-play" id="againButton" type="button" style="width:120px;height:120px;font-size:16px;margin:0 auto">AGAIN</button>
-</section>
+    <button class="btn-mode-toggle" id="edit-mode-btn" onclick="toggleEditMode()">
+      ⚙ Edit
+    </button>
+  </div>
 
-<section id="learn" class="screen hidden">
-<div class="card-stats"><h3 style="font-size:15px;margin-bottom:8px">Staff Lines (Bottom to Top)</h3><p class="learn-text"><b>E4 - G4 - B4 - D5 - F5</b><br><i>Every Good Boy Does Fine</i></p></div>
-<div class="card-stats"><h3 style="font-size:15px;margin-bottom:8px">Staff Spaces (Bottom to Top)</h3><p class="learn-text"><b>F4 - A4 - C5 - E5</b><br>Spells <b>F - A - C - E</b></p></div>
-</section>
-</main>
+  <!-- Edit Toolbar Drawer -->
+  <div class="edit-toolbar">
+    <span style="font-size: 0.8rem; color: #fb923c; font-weight: 600;">Edit & Reorder Mode Active</span>
+    <div class="toolbar-actions">
+      <button class="btn-action highlight" onclick="openAddForm()">+ Add New Title</button>
+      <button class="btn-action" onclick="editAppHeader()">✎ Edit Header</button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Project Form Panel -->
+  <div class="form-panel" id="form-panel">
+    <h3 id="form-title" style="font-size: 0.95rem; margin-bottom: 12px;">Add Project</h3>
+    <input type="hidden" id="edit-id">
+    
+    <div class="form-group">
+      <label>Title Name & Year</label>
+      <input type="text" id="input-title" class="form-control" placeholder="e.g. Blade (2026)">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="flex: 1;">
+        <label>Duration (Minutes)</label>
+        <input type="number" id="input-duration" class="form-control" placeholder="e.g. 135">
+      </div>
+      <div class="form-group" style="flex: 1;">
+        <label>Phase Group</label>
+        <select id="input-phase" class="form-control">
+          <option value="phase1">Phase 1: Legacy</option>
+          <option value="phase2">Phase 2: Infinity</option>
+          <option value="phase3">Phase 3: Multiverse</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-buttons">
+      <button class="btn-action" onclick="closeForm()">Cancel</button>
+      <button class="btn-action highlight" onclick="saveProjectForm()">Save</button>
+    </div>
+  </div>
+
+  <!-- Item List -->
+  <div id="list-root" class="list-container"></div>
+
+  <div class="footer-actions">
+    <button class="btn-reset" onclick="resetToFactory()">⟲ Reset to Default State</button>
+  </div>
 </div>
 
 <script>
-"use strict";
+  const DEFAULT_APP_CONFIG = {
+    title: "MCU Roadmap to Doomsday",
+    subtitle: "Complete Full Title Checklist"
+  };
 
-const ALL_NOTES=[
-{name:"C3",note:"C",octave:3,y:199,freq:130.81},{name:"D3",note:"D",octave:3,y:192,freq:146.83},{name:"E3",note:"E",octave:3,y:185,freq:164.81},{name:"F3",note:"F",octave:3,y:178,freq:174.61},{name:"G3",note:"G",octave:3,y:171,freq:196},{name:"A3",note:"A",octave:3,y:164,freq:220},{name:"B3",note:"B",octave:3,y:157,freq:246.94},
-{name:"C4",note:"C",octave:4,y:150,freq:261.63},{name:"D4",note:"D",octave:4,y:143,freq:293.66},{name:"E4",note:"E",octave:4,y:136,freq:329.63},{name:"F4",note:"F",octave:4,y:129,freq:349.23},{name:"G4",note:"G",octave:4,y:122,freq:392},{name:"A4",note:"A",octave:4,y:115,freq:440},{name:"B4",note:"B",octave:4,y:108,freq:493.88},
-{name:"C5",note:"C",octave:5,y:101,freq:523.25},{name:"D5",note:"D",octave:5,y:94,freq:587.33},{name:"E5",note:"E",octave:5,y:87,freq:659.25},{name:"F5",note:"F",octave:5,y:80,freq:698.46},{name:"G5",note:"G",octave:5,y:73,freq:783.99},{name:"A5",note:"A",octave:5,y:66,freq:880},{name:"B5",note:"B",octave:5,y:59,freq:987.77},{name:"C6",note:"C",octave:6,y:52,freq:1046.5}
-];
+  const DEFAULT_PROJECTS = [
+    // Phase 1: Legacy Multiverse Foundations
+    { id: "p1", phase: 'phase1', title: "X-Men (2000)", duration: 104, done: true },
+    { id: "p2", phase: 'phase1', title: "Spider-Man (2002)", duration: 121, done: true },
+    { id: "p3", phase: 'phase1', title: "X2: X-Men United (2003)", duration: 134, done: true },
+    { id: "p4", phase: 'phase1', title: "Spider-Man 2 (2004)", duration: 127, done: true },
+    { id: "p5", phase: 'phase1', title: "Fantastic Four (2005)", duration: 106, done: true },
+    { id: "p6", phase: 'phase1', title: "X-Men: The Last Stand (2006)", duration: 104, done: true },
+    { id: "p7", phase: 'phase1', title: "Spider-Man 3 (2007)", duration: 139, done: true },
+    { id: "p8", phase: 'phase1', title: "X-Men: First Class (2011)", duration: 131, done: true },
+    { id: "p9", phase: 'phase1', title: "The Amazing Spider-Man (2012)", duration: 136, done: true },
+    { id: "p10", phase: 'phase1', title: "The Wolverine (2013)", duration: 126, done: true },
+    { id: "p11", phase: 'phase1', title: "The Amazing Spider-Man 2 (2014)", duration: 142, done: true },
+    { id: "p12", phase: 'phase1', title: "X-Men: Days of Future Past (2014)", duration: 132, done: true },
+    { id: "p13", phase: 'phase1', title: "Deadpool (2016)", duration: 108, done: true },
+    { id: "p14", phase: 'phase1', title: "Logan (2017)", duration: 137, done: true },
+    { id: "p15", phase: 'phase1', title: "Deadpool 2 (2018)", duration: 119, done: true },
 
-let rangeStartName="C4",rangeEndName="A5",activeNotePool=[],sessionDuration=30,timeLeft=30,score=0,answered=0,correct=0,soundEnabled=true,timerId=null,feedbackTimeoutId=null,currentPitch=null,audioCtx=null,isLocked=false,gameRunning=false;
+    // Phase 2: The Infinity Saga Core
+    { id: "p16", phase: 'phase2', title: "Iron Man (2008)", duration: 126, done: true },
+    { id: "p17", phase: 'phase2', title: "Iron Man 2 (2010)", duration: 124, done: true },
+    { id: "p18", phase: 'phase2', title: "Thor (2011)", duration: 115, done: true },
+    { id: "p19", phase: 'phase2', title: "Captain America: The First Avenger (2011)", duration: 124, done: true },
+    { id: "p20", phase: 'phase2', title: "Marvel's The Avengers (2012)", duration: 143, done: true },
+    { id: "p21", phase: 'phase2', title: "Captain America: The Winter Soldier (2014)", duration: 136, done: true },
+    { id: "p22", phase: 'phase2', title: "Guardians of the Galaxy (2014)", duration: 121, done: true },
+    { id: "p23", phase: 'phase2', title: "Avengers: Age of Ultron (2015)", duration: 141, done: true },
+    { id: "p24", phase: 'phase2', title: "Ant-Man (2015)", duration: 117, done: true },
+    { id: "p25", phase: 'phase2', title: "Captain America: Civil War (2016)", duration: 147, done: true },
+    { id: "p26", phase: 'phase2', title: "Doctor Strange (2016)", duration: 115, done: true },
+    { id: "p27", phase: 'phase2', title: "Guardians of the Galaxy Vol. 2 (2017)", duration: 136, done: true },
+    { id: "p28", phase: 'phase2', title: "Spider-Man: Homecoming (2017)", duration: 133, done: true },
+    { id: "p29", phase: 'phase2', title: "Thor: Ragnarok (2017)", duration: 130, done: true },
+    { id: "p30", phase: 'phase2', title: "Black Panther (2018)", duration: 134, done: true },
+    { id: "p31", phase: 'phase2', title: "Avengers: Infinity War (2018)", duration: 149, done: true },
+    { id: "p32", phase: 'phase2', title: "Ant-Man and the Wasp (2018)", duration: 118, done: true },
+    { id: "p33", phase: 'phase2', title: "Captain Marvel (2019)", duration: 124, done: true },
+    { id: "p34", phase: 'phase2', title: "Avengers: Endgame (2019)", duration: 181, done: true },
 
-const screens=Array.from(document.querySelectorAll(".screen"));
-const viewTitle=document.getElementById("viewTitle");
-const leftNavBtn=document.getElementById("leftNavBtn");
-const rightNavBtn=document.getElementById("rightNavBtn");
-const staffStage=document.getElementById("staffStage");
-const noteGroup=document.getElementById("svgNoteGroup");
-const stem=document.getElementById("svgStem");
-const ledgersGroup=document.getElementById("svgLedgers");
-const whiteKeys=Array.from(document.querySelectorAll("#pianoKeyboard .white-key"));
-const blackKeys=Array.from(document.querySelectorAll("#pianoKeyboard .black-key"));
-const allKeys=[...whiteKeys,...blackKeys];
+    // Phase 3: The Multiverse Saga (Road to Doomsday)
+    { id: "p35", phase: 'phase3', title: "Loki (Season 1) (2021)", duration: 285, done: true },
+    { id: "p36", phase: 'phase3', title: "WandaVision (Season 1) (2021)", duration: 350, done: false },
+    { id: "p37", phase: 'phase3', title: "The Falcon and the Winter Soldier (Season 1) (2021)", duration: 305, done: false },
+    { id: "p38", phase: 'phase3', title: "Shang-Chi and the Legend of the Ten Rings (2021)", duration: 132, done: false },
+    { id: "p39", phase: 'phase3', title: "Spider-Man: Far From Home (2019)", duration: 129, done: false },
+    { id: "p40", phase: 'phase3', title: "Spider-Man: No Way Home (2021)", duration: 148, done: false },
+    { id: "p41", phase: 'phase3', title: "Doctor Strange in the Multiverse of Madness (2022)", duration: 126, done: false },
+    { id: "p42", phase: 'phase3', title: "Black Panther: Wakanda Forever (2022)", duration: 161, done: false },
+    { id: "p43", phase: 'phase3', title: "Ant-Man and the Wasp: Quantumania (2023)", duration: 125, done: false },
+    { id: "p44", phase: 'phase3', title: "Loki (Season 2) (2023)", duration: 290, done: false },
+    { id: "p45", phase: 'phase3', title: "The Marvels (2023)", duration: 105, done: false },
+    { id: "p46", phase: 'phase3', title: "Deadpool & Wolverine (2024)", duration: 128, done: false },
+    { id: "p47", phase: 'phase3', title: "Agatha All Along (Season 1) (2024)", duration: 340, done: false },
+    { id: "p48", phase: 'phase3', title: "Captain America: Brave New World (2025)", duration: 125, done: false },
+    { id: "p49", phase: 'phase3', title: "Thunderbolts* (2025)", duration: 130, done: false },
+    { id: "p50", phase: 'phase3', title: "The Fantastic Four: First Steps (2025)", duration: 130, done: false },
+    { id: "p51", phase: 'phase3', title: "Spider-Man: Brand New Day (2026)", duration: 135, done: false },
+    { id: "p52", phase: 'phase3', title: "Avengers: Doomsday (2026)", duration: 160, done: false }
+  ];
 
-function initAudio(){
-  try{
-    const AudioCtx=window.AudioContext||window.webkitAudioContext;
-    if(!AudioCtx)return;
-    if(!audioCtx)audioCtx=new AudioCtx();
-    if(audioCtx.state==="suspended")audioCtx.resume().catch(()=>{});
-  }catch(e){}
-}
+  const phaseHeaders = {
+    phase1: "PHASE 1: LEGACY MULTIVERSE FOUNDATIONS",
+    phase2: "PHASE 2: THE INFINITY SAGA CORE",
+    phase3: "PHASE 3: THE MULTIVERSE SAGA (ROAD TO DOOMSDAY)"
+  };
 
-function playPitch(frequency,isCorrect=true){
-  if(!soundEnabled)return;
-  initAudio();
-  if(!audioCtx)return;
-  try{
-    const oscillator=audioCtx.createOscillator();
-    const gain=audioCtx.createGain();
-    oscillator.type=isCorrect?"sine":"sawtooth";
-    oscillator.frequency.setValueAtTime(frequency,audioCtx.currentTime);
-    gain.gain.setValueAtTime(.18,audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+(isCorrect?.24:.14));
-    oscillator.connect(gain);gain.connect(audioCtx.destination);
-    oscillator.start();oscillator.stop(audioCtx.currentTime+.25);
-  }catch(e){}
-}
+  let appConfig = JSON.parse(localStorage.getItem('mcu_app_config')) || DEFAULT_APP_CONFIG;
+  let projects = JSON.parse(localStorage.getItem('mcu_clean_list')) || DEFAULT_PROJECTS;
+  let currentFilter = 'all';
+  let isEditMode = false;
 
-function stopGameTimer(){if(timerId!==null){clearInterval(timerId);timerId=null}}
-function clearFeedbackTimer(){if(feedbackTimeoutId!==null){clearTimeout(feedbackTimeoutId);feedbackTimeoutId=null}}
-
-function resetVisualState(){
-  clearFeedbackTimer();
-  isLocked=false;
-  if(staffStage)staffStage.classList.remove("flash-red-bg");
-  if(noteGroup)noteGroup.classList.remove("correct-note");
-  allKeys.forEach(k=>k.classList.remove("active","key-correct","key-wrong"));
-}
-
-function go(screenId){
-  const target=document.getElementById(screenId);
-  if(!target)return;
-  if(screenId!=="game"&&gameRunning){
-    gameRunning=false;stopGameTimer();resetVisualState();
+  function persist() {
+    localStorage.setItem('mcu_clean_list', JSON.stringify(projects));
+    localStorage.setItem('mcu_app_config', JSON.stringify(appConfig));
   }
-  screens.forEach(screen=>screen.classList.toggle("hidden",screen.id!==screenId));
-  const titles={home:"Music Tutor Pro",game:"Reading Drill",stats:"Your Stats",options:"Preferences",learn:"Reference",result:"Summary"};
-  viewTitle.textContent=titles[screenId]||"Music Tutor";
-  if(screenId==="home"){
-    leftNavBtn.textContent="";leftNavBtn.onclick=null;
-    rightNavBtn.style.visibility="visible";rightNavBtn.textContent="Stats";rightNavBtn.onclick=()=>go("stats");
-  }else{
-    leftNavBtn.textContent="\u2039 Back";leftNavBtn.onclick=()=>go("home");
-    rightNavBtn.style.visibility="hidden";rightNavBtn.onclick=null;
-  }
-  if(screenId==="stats")renderStats();
-}
 
-function setupRangeControls(){
-  const startSelect=document.getElementById("rangeStart"),endSelect=document.getElementById("rangeEnd");
-  startSelect.innerHTML="";endSelect.innerHTML="";
-  ALL_NOTES.forEach(note=>{
-    const a=document.createElement("option");a.value=note.name;a.textContent=note.name;startSelect.appendChild(a);
-    const b=document.createElement("option");b.value=note.name;b.textContent=note.name;endSelect.appendChild(b);
-  });
-  startSelect.value=rangeStartName;endSelect.value=rangeEndName;
-  startSelect.addEventListener("change",updateRangeFromSelects);
-  endSelect.addEventListener("change",updateRangeFromSelects);
-  document.querySelectorAll("#presetPills .opt-pill").forEach(button=>{
-    button.addEventListener("click",()=>{
-      applyCustomRange(button.dataset.start,button.dataset.end);
+  function toggleStatus(id) {
+    const item = projects.find(p => p.id === id);
+    if (item) {
+      item.done = !item.done;
+      persist();
+      render();
+    }
+  }
+
+  function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const container = document.getElementById('app-container');
+    const btn = document.getElementById('edit-mode-btn');
+    
+    if (isEditMode) {
+      container.classList.add('edit-mode-active');
+      btn.classList.add('active');
+      btn.textContent = '✕ Done Editing';
+    } else {
+      container.classList.remove('edit-mode-active');
+      btn.classList.remove('active');
+      btn.textContent = '⚙ Edit';
+      closeForm();
+    }
+    render();
+  }
+
+  function editAppHeader() {
+    const newTitle = prompt("Enter new app title:", appConfig.title);
+    if (newTitle !== null && newTitle.trim() !== '') {
+      appConfig.title = newTitle.trim();
+    }
+    const newSubtitle = prompt("Enter new subtitle:", appConfig.subtitle);
+    if (newSubtitle !== null && newSubtitle.trim() !== '') {
+      appConfig.subtitle = newSubtitle.trim();
+    }
+    persist();
+    renderHeader();
+  }
+
+  function renderHeader() {
+    document.getElementById('app-title-text').textContent = appConfig.title;
+    document.getElementById('app-subtitle-text').textContent = appConfig.subtitle;
+  }
+
+  function moveItem(index, direction) {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= projects.length) return;
+    const [moved] = projects.splice(index, 1);
+    projects.splice(targetIndex, 0, moved);
+    persist();
+    render();
+  }
+
+  function deleteItem(id) {
+    if (confirm("Delete this entry?")) {
+      projects = projects.filter(p => p.id !== id);
+      persist();
+      render();
+    }
+  }
+
+  function openAddForm() {
+    document.getElementById('form-panel').classList.add('open');
+    document.getElementById('form-title').textContent = "Add Project";
+    document.getElementById('edit-id').value = '';
+    document.getElementById('input-title').value = '';
+    document.getElementById('input-duration').value = '';
+    document.getElementById('input-phase').value = 'phase3';
+    window.scrollTo({ top: 180, behavior: 'smooth' });
+  }
+
+  function openEditForm(id) {
+    const item = projects.find(p => p.id === id);
+    if (!item) return;
+    document.getElementById('form-panel').classList.add('open');
+    document.getElementById('form-title').textContent = "Edit Project";
+    document.getElementById('edit-id').value = item.id;
+    document.getElementById('input-title').value = item.title;
+    document.getElementById('input-duration').value = item.duration;
+    document.getElementById('input-phase').value = item.phase;
+    window.scrollTo({ top: 180, behavior: 'smooth' });
+  }
+
+  function closeForm() {
+    document.getElementById('form-panel').classList.remove('open');
+  }
+
+  function saveProjectForm() {
+    const editId = document.getElementById('edit-id').value;
+    const title = document.getElementById('input-title').value.trim();
+    const duration = parseInt(document.getElementById('input-duration').value, 10);
+    const phase = document.getElementById('input-phase').value;
+
+    if (!title || isNaN(duration) || duration <= 0) {
+      alert("Please enter a valid title and positive duration (minutes).");
+      return;
+    }
+
+    if (editId) {
+      const item = projects.find(p => p.id === editId);
+      if (item) {
+        item.title = title;
+        item.duration = duration;
+        item.phase = phase;
+      }
+    } else {
+      projects.push({
+        id: "p_" + Date.now(),
+        phase,
+        title,
+        duration,
+        done: false
+      });
+    }
+
+    persist();
+    closeForm();
+    render();
+  }
+
+  function resetToFactory() {
+    if (confirm("Reset everything back to default watchlist and watch progress?")) {
+      projects = JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+      appConfig = JSON.parse(JSON.stringify(DEFAULT_APP_CONFIG));
+      persist();
+      renderHeader();
+      render();
+    }
+  }
+
+  function setFilter(filter, el) {
+    currentFilter = filter;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  function formatHours(minutes) {
+    return (minutes / 60).toFixed(1) + 'h';
+  }
+
+  function render() {
+    const totalMinutes = projects.reduce((acc, curr) => acc + curr.duration, 0);
+    const watchedMinutes = projects.reduce((acc, curr) => acc + (curr.done ? curr.duration : 0), 0);
+    const watchedCount = projects.filter(p => p.done).length;
+    const durationPercent = totalMinutes > 0 ? Math.round((watchedMinutes / totalMinutes) * 100) : 0;
+
+    document.getElementById('progress-titles').textContent = `${watchedCount} / ${projects.length} Completed`;
+    document.getElementById('progress-percent').textContent = `${durationPercent}%`;
+    document.getElementById('progress-bar').style.width = `${durationPercent}%`;
+    document.getElementById('progress-hours').textContent = `${formatHours(watchedMinutes)} / ${formatHours(totalMinutes)} watched`;
+
+    const root = document.getElementById('list-root');
+    root.innerHTML = '';
+
+    let lastPhase = '';
+
+    projects.forEach((item, index) => {
+      if (currentFilter !== 'all' && item.phase !== currentFilter) return;
+
+      if (currentFilter === 'all' && item.phase !== lastPhase) {
+        lastPhase = item.phase;
+        const phaseItems = projects.filter(p => p.phase === lastPhase);
+        const phaseDone = phaseItems.filter(p => p.done).length;
+
+        const header = document.createElement('div');
+        header.className = 'phase-label';
+        header.innerHTML = `<span class="phase-dot"></span> ${phaseHeaders[lastPhase] || lastPhase} (${phaseDone}/${phaseItems.length})`;
+        root.appendChild(header);
+      }
+
+      const card = document.createElement('div');
+      card.className = `item-card ${item.done ? 'completed' : ''}`;
+
+      card.innerHTML = `
+        <div class="item-main">
+          <span class="item-index">${index + 1}.</span>
+          <div class="item-info">
+            <div class="item-title">${item.title}</div>
+            <div class="item-meta">${formatHours(item.duration)} (${item.duration} min)</div>
+          </div>
+        </div>
+        
+        <button class="btn-toggle ${item.done ? 'done' : ''}" onclick="toggleStatus('${item.id}')">
+          ${item.done ? '✓ Done' : 'Mark'}
+        </button>
+
+        <div class="item-edit-controls">
+          <button class="btn-icon" onclick="moveItem(${index}, -1)" title="Move Up">▲</button>
+          <button class="btn-icon" onclick="moveItem(${index}, 1)" title="Move Down">▼</button>
+          <button class="btn-icon" onclick="openEditForm('${item.id}')" title="Edit details">✎</button>
+          <button class="btn-icon delete" onclick="deleteItem('${item.id}')" title="Delete">✕</button>
+        </div>
+      `;
+
+      root.appendChild(card);
     });
-  });
-  applyCustomRange(rangeStartName,rangeEndName);
-}
-
-function updateRangeFromSelects(){
-  const startVal=document.getElementById("rangeStart").value;
-  const endVal=document.getElementById("rangeEnd").value;
-  applyCustomRange(startVal,endVal);
-}
-
-function applyCustomRange(start,end){
-  let startIndex=ALL_NOTES.findIndex(note=>note.name===start);
-  let endIndex=ALL_NOTES.findIndex(note=>note.name===end);
-  if(startIndex<0)startIndex=0;if(endIndex<0)endIndex=ALL_NOTES.length-1;
-  const minIndex=Math.min(startIndex,endIndex),maxIndex=Math.max(startIndex,endIndex);
-  rangeStartName=ALL_NOTES[minIndex].name;rangeEndName=ALL_NOTES[maxIndex].name;
-  activeNotePool=ALL_NOTES.slice(minIndex,maxIndex+1);
-  document.getElementById("rangeStart").value=rangeStartName;
-  document.getElementById("rangeEnd").value=rangeEndName;
-  document.getElementById("homeRangeBadge").textContent="RANGE: "+rangeStartName+" - "+rangeEndName;
-
-  document.querySelectorAll("#presetPills .opt-pill").forEach(button=>{
-    const isMatch=button.dataset.start===rangeStartName&&button.dataset.end===rangeEndName;
-    button.classList.toggle("active",isMatch);
-  });
-}
-
-function startGame(){
-  initAudio();stopGameTimer();resetVisualState();
-  if(!activeNotePool.length)applyCustomRange(rangeStartName,rangeEndName);
-  score=0;answered=0;correct=0;timeLeft=sessionDuration;currentPitch=null;gameRunning=true;
-  go("game");updateMetrics();nextNote();
-  timerId=setInterval(()=>{
-    if(!gameRunning)return;
-    timeLeft=Math.max(0,timeLeft-1);updateMetrics();
-    if(timeLeft<=0)finishGame();
-  },1000);
-}
-
-function updateMetrics(){
-  const minutes=Math.floor(timeLeft/60).toString().padStart(2,"0");
-  const seconds=Math.max(0,timeLeft%60).toString().padStart(2,"0");
-  const accuracy=answered>0?Math.round(correct/answered*100):0;
-  const points=score*accuracy;
-  document.getElementById("timer").textContent=minutes+":"+seconds;
-  document.getElementById("score").textContent=score;
-  document.getElementById("accuracy").textContent=accuracy+"%";
-  document.getElementById("points").textContent=points;
-}
-
-function nextNote(){
-  if(!gameRunning||!activeNotePool.length)return;
-  let choices=activeNotePool.filter(note=>!currentPitch||note.name!==currentPitch.name);
-  if(!choices.length)choices=activeNotePool;
-  currentPitch=choices[Math.floor(Math.random()*choices.length)];
-  noteGroup.classList.remove("correct-note");
-  noteGroup.setAttribute("transform","translate(195,"+currentPitch.y+")");
-  if(currentPitch.y<=108){
-    stem.setAttribute("x1","-7.2");stem.setAttribute("x2","-7.2");stem.setAttribute("y1","2");stem.setAttribute("y2","42");
-  }else{
-    stem.setAttribute("x1","7.2");stem.setAttribute("x2","7.2");stem.setAttribute("y1","-2");stem.setAttribute("y2","-42");
   }
-  ledgersGroup.innerHTML="";
-  const noteY=currentPitch.y;
-  if(noteY>=150){
-    for(let y=150;y<=noteY+3;y+=14)createLedger(y);
-  }
-  if(noteY<=66){
-    for(let y=66;y>=noteY-3;y-=14)createLedger(y);
-  }
-}
 
-function createLedger(y){
-  const line=document.createElementNS("http://www.w3.org/2000/svg","line");
-  line.setAttribute("x1","178");line.setAttribute("x2","212");line.setAttribute("y1",y);line.setAttribute("y2",y);
-  ledgersGroup.appendChild(line);
-}
-
-function handleInput(keyElement,keyName){
-  if(!gameRunning||isLocked||!currentPitch)return;
-  answered++;
-  const correctAnswer=keyName===currentPitch.note;
-  if(correctAnswer){
-    correct++;score++;playPitch(currentPitch.freq,true);
-    keyElement.classList.add("key-correct");noteGroup.classList.add("correct-note");isLocked=true;updateMetrics();clearFeedbackTimer();
-    feedbackTimeoutId=setTimeout(()=>{
-      feedbackTimeoutId=null;keyElement.classList.remove("key-correct");noteGroup.classList.remove("correct-note");
-      if(!gameRunning){isLocked=false;return}isLocked=false;nextNote();
-    },180);
-  }else{
-    playPitch(110,false);
-    keyElement.classList.add("key-wrong");
-    const correctKey=whiteKeys.find(k=>k.dataset.note===currentPitch.note);
-    if(correctKey)correctKey.classList.add("key-correct");
-    staffStage.classList.add("flash-red-bg");
-    isLocked=true;updateMetrics();clearFeedbackTimer();
-    feedbackTimeoutId=setTimeout(()=>{
-      feedbackTimeoutId=null;
-      keyElement.classList.remove("key-wrong");
-      if(correctKey)correctKey.classList.remove("key-correct");
-      staffStage.classList.remove("flash-red-bg");
-      if(!gameRunning){isLocked=false;return}isLocked=false;nextNote();
-    },220);
-  }
-}
-
-whiteKeys.forEach(key=>{
-  key.addEventListener("pointerdown",event=>{
-    event.preventDefault();
-    initAudio();
-    try{key.setPointerCapture(event.pointerId)}catch(e){}
-    key.classList.add("active");
-    handleInput(key,key.dataset.note);
-  });
-
-  const releaseKey=event=>{
-    try{
-      if(key.hasPointerCapture(event.pointerId)){
-        key.releasePointerCapture(event.pointerId);
-      }
-    }catch(e){}
-    key.classList.remove("active");
-  };
-
-  key.addEventListener("pointerup",releaseKey);
-  key.addEventListener("pointercancel",releaseKey);
-});
-
-blackKeys.forEach(key=>{
-  key.addEventListener("pointerdown",event=>{
-    event.preventDefault();
-    initAudio();
-    try{key.setPointerCapture(event.pointerId)}catch(e){}
-    key.classList.add("active");
-    const freq=parseFloat(key.dataset.frequency)||300;
-    playPitch(freq,true);
-  });
-
-  const releaseKey=event=>{
-    try{
-      if(key.hasPointerCapture(event.pointerId)){
-        key.releasePointerCapture(event.pointerId);
-      }
-    }catch(e){}
-    key.classList.remove("active");
-  };
-
-  key.addEventListener("pointerup",releaseKey);
-  key.addEventListener("pointercancel",releaseKey);
-});
-
-function finishGame(){
-  if(!gameRunning)return;
-  gameRunning=false;stopGameTimer();resetVisualState();
-  const accuracy=answered>0?Math.round(correct/answered*100):0,points=score*accuracy;
-  document.getElementById("finalScore").textContent=score;
-  document.getElementById("finalAcc").textContent=accuracy+"%";
-  document.getElementById("finalPoints").textContent=points;
-  const games=parseInt(localStorage.getItem("mt_pro_games")||"0",10);
-  const bestScore=parseInt(localStorage.getItem("mt_pro_best_score")||"0",10);
-  const bestPoints=parseInt(localStorage.getItem("mt_pro_best_points")||"0",10);
-  const totalAnswered=parseInt(localStorage.getItem("mt_pro_total_ans")||"0",10)+answered;
-  const totalCorrect=parseInt(localStorage.getItem("mt_pro_total_cor")||"0",10)+correct;
-  localStorage.setItem("mt_pro_games",String(games+1));
-  localStorage.setItem("mt_pro_best_score",String(Math.max(bestScore,score)));
-  localStorage.setItem("mt_pro_best_points",String(Math.max(bestPoints,points)));
-  localStorage.setItem("mt_pro_total_ans",String(totalAnswered));
-  localStorage.setItem("mt_pro_total_cor",String(totalCorrect));
-  go("result");
-}
-
-function renderStats(){
-  const games=parseInt(localStorage.getItem("mt_pro_games")||"0",10);
-  const bestScore=parseInt(localStorage.getItem("mt_pro_best_score")||"0",10);
-  const bestPoints=parseInt(localStorage.getItem("mt_pro_best_points")||"0",10);
-  const totalAnswered=parseInt(localStorage.getItem("mt_pro_total_ans")||"0",10);
-  const totalCorrect=parseInt(localStorage.getItem("mt_pro_total_cor")||"0",10);
-  const averageAccuracy=totalAnswered>0?Math.round((totalCorrect/totalAnswered)*100):0;
-  document.getElementById("statGames").textContent=games;
-  document.getElementById("statScore").textContent=bestScore;
-  document.getElementById("statAcc").textContent=averageAccuracy+"%";
-  document.getElementById("statPoints").textContent=bestPoints;
-}
-
-document.querySelectorAll("#optDuration .opt-pill").forEach(pill=>{
-  pill.addEventListener("click",()=>{
-    document.querySelectorAll("#optDuration .opt-pill").forEach(button=>button.classList.remove("active"));
-    pill.classList.add("active");
-    const value=parseInt(pill.dataset.time,10);
-    if(Number.isFinite(value)&&value>0)sessionDuration=value;
-  });
-});
-
-const audioToggle=document.getElementById("btnAudioToggle");
-audioToggle.addEventListener("click",()=>{
-  soundEnabled=!soundEnabled;
-  audioToggle.textContent=soundEnabled?"Enabled":"Muted";
-  audioToggle.classList.toggle("active",soundEnabled);
-  if(soundEnabled)initAudio();
-});
-
-document.getElementById("startButton").addEventListener("click",startGame);
-document.getElementById("againButton").addEventListener("click",startGame);
-document.getElementById("learnBanner").addEventListener("click",()=>go("learn"));
-document.getElementById("settingsTile").addEventListener("click",()=>go("options"));
-document.getElementById("progressTile").addEventListener("click",()=>go("stats"));
-
-setupRangeControls();
-go("home");
-updateMetrics();
+  renderHeader();
+  render();
 </script>
+
 </body>
 </html>
