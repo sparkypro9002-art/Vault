@@ -1,4 +1,4 @@
-name: Build CineTrack APK
+name: Build GPT Database APK
 
 on:
   push:
@@ -39,8 +39,8 @@ jobs:
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/assets
           cat << 'EOF' > capacitor.config.json
           {
-            "appId": "com.cinetrack.roadmap",
-            "appName": "CineTrack",
+            "appId": "com.gptdatabase.roadmap",
+            "appName": "GPT Database",
             "webDir": "www"
           }
           EOF
@@ -78,6 +78,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: CineTrack-Debug-APK
+          name: GPT-Database-Debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           
