@@ -40,3 +40,4 @@ jobs:
         with:
           name: PrivateOfflineAI-debug-apk
           path: project/app/build/outputs/apk/debug/app-debug.apk
+          
